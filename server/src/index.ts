@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/database";
 import router from "./routes/taskRoutes";
+import projectRouter from "./routes/projectRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ connectDB();
 
 // Routes
 app.use("/api/tasks", router);
+app.use("/api/projects", projectRouter);
 
 // Basic route
 app.get("/", (req, res) => {

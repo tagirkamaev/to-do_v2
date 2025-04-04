@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/database";
-import router from "./routes/taskRoutes";
-import projectRouter from "./routes/projectRoutes";
+import taskRoutes from "./routes/taskRoutes";
+import projectRoutes from "./routes/projectRoutes";
+import userRoutes from "./routes/userRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -19,8 +20,9 @@ app.use(express.json());
 connectDB();
 
 // Routes
-app.use("/api/tasks", router);
-app.use("/api/projects", projectRouter);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/users", userRoutes);
 
 // Basic route
 app.get("/", (req, res) => {

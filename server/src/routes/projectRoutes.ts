@@ -14,25 +14,25 @@ import {
   validateRequest,
 } from "../middleware/projectValidation";
 
-const projectRouter = express.Router();
+const projectRoutes = express.Router();
 
-projectRouter.get("/", getProjects);
+projectRoutes.get("/", getProjects);
 
-projectRouter.post("/", validateProject, validateRequest, createProject);
+projectRoutes.post("/", validateProject, validateRequest, createProject);
 
-projectRouter.put("/:id", validateProjectId, validateProject, validateRequest, updateProject);
+projectRoutes.put("/:id", validateProjectId, validateProject, validateRequest, updateProject);
 
-projectRouter.delete("/:id", validateProjectId, validateRequest, deleteProject);
+projectRoutes.delete("/:id", validateProjectId, validateRequest, deleteProject);
 
 // Routes for adding and deleting tasks
-projectRouter.post(
+projectRoutes.post(
   "/:projectId/tasks/:taskId",
   validateProjectId,
   validateTaskId,
   validateRequest,
   addTaskToProject
 );
-projectRouter.delete(
+projectRoutes.delete(
   "/:projectId/tasks/:taskId",
   validateProjectId,
   validateTaskId,
@@ -40,4 +40,4 @@ projectRouter.delete(
   removeTaskFromProject
 );
 
-export default projectRouter;
+export default projectRoutes;

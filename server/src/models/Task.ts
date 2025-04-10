@@ -16,6 +16,16 @@ const taskSchema = new Schema<ITask>(
       type: Boolean,
       default: false,
     },
+    project: {
+      type: Schema.Types.ObjectId,
+      ref: "Project",
+      required: false,
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Task owner is required"],
+    },
   },
   {
     timestamps: true, // Автоматически добавляет createdAt и updatedAt

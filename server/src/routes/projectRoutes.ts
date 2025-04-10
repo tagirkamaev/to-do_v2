@@ -6,6 +6,7 @@ import {
   deleteProject,
   addTaskToProject,
   removeTaskFromProject,
+  getProjectTasks,
 } from "../controllers/projectController";
 import {
   validateProject,
@@ -13,8 +14,11 @@ import {
   validateTaskId,
   validateRequest,
 } from "../middleware/projectValidation";
+import { auth } from "../middleware/auth";
 
 const projectRoutes = express.Router();
+
+projectRoutes.use(auth);
 
 projectRoutes.get("/", getProjects);
 
@@ -39,5 +43,8 @@ projectRoutes.delete(
   validateRequest,
   removeTaskFromProject
 );
+
+// Маршрут для получения задач проекта
+projectRoutes.get("/:id/tasks", validateProjectId, validateRequest, getProjectTasks);
 
 export default projectRoutes;

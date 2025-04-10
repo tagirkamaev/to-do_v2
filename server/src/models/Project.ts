@@ -8,6 +8,11 @@ const projectSchema = new Schema<IProject>(
       required: [true, "Title is required"],
       trim: true,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Project owner is required"],
+    },
     tasks: [
       {
         type: Schema.Types.ObjectId,

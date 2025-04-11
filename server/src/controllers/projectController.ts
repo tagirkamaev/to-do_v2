@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import Project from "../models/Project";
 import Task from "../models/Task";
 
@@ -100,7 +101,7 @@ export const addTaskToProject = async (req: Request, res: Response) => {
     const { projectId, taskId } = req.params;
     const project = await Project.findByIdAndUpdate(
       projectId,
-      { $addToSet: { tasks: taskId } },
+      { $addToSet: { tasks: new mongoose.Types.ObjectId(taskId) } },
       { new: true }
     );
     if (!project) {
@@ -118,7 +119,7 @@ export const removeTaskFromProject = async (req: Request, res: Response) => {
     const { projectId, taskId } = req.params;
     const project = await Project.findByIdAndUpdate(
       projectId,
-      { $pull: { tasks: taskId } },
+      { $pull: { tasks: new mongoose.Types.ObjectId(taskId) } },
       { new: true }
     );
     if (!project) {

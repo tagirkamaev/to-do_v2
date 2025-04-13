@@ -43,25 +43,13 @@ export const createTask = async (req: Request, res: Response) => {
       project: projectId, // Явно устанавливаем project
     });
 
-    console.log(`Created task:`, task);
-
     // Если задача создана с projectId, добавляем её в массив задач проекта
     if (projectId) {
-      const updatedProject = await Project.findByIdAndUpdate(
-        projectId,
-        { $addToSet: { tasks: new mongoose.Types.ObjectId(task._id) } },
-        { new: true }
-      );
-      if (updatedProject) {
-        console.log(`Added task ${task._id} to project ${projectId}`, updatedProject.tasks);
-      } else {
-        console.log(`Warning: Project ${projectId} not found after task creation`);
-      }
+      await Project.findByIdAndUpdate(projectId, { $addToSet: { tasks: task._id } }, { new: true });
     }
 
     res.status(201).json(task);
   } catch (error) {
-    console.error("Error creating task:", error);
     res.status(400).json({ message: "Error creating task", error });
   }
 };
@@ -89,33 +77,35 @@ export const updateTask = async (req: Request, res: Response) => {
       }
     }
 
-    // Нормализуем ID проектов для сравнения
+    // Сравним ID проектов. Для этого приведем их к строке
     const currentProjectId = currentTask.project ? currentTask.project.toString() : null;
     const newProjectId = projectId ? projectId.toString() : null;
 
-    // Транзакционная логика для обеспечения согласованности данных
     if (currentProjectId !== newProjectId) {
-      // Шаг 1: Удаляем задачу из старого проекта (если был)
+      // Удаляем задачу из старого проекта (если он был)
       if (currentProjectId) {
         await Project.findByIdAndUpdate(currentProjectId, {
-          $pull: { tasks: new mongoose.Types.ObjectId(taskId) },
+          $pull: { tasks: taskId },
         });
       }
 
-      // Шаг 2: Добавляем задачу в новый проект (если есть)
+      // Добавляем задачу в новый проект (если он есть)
       if (newProjectId) {
-        const updatedProject = await Project.findByIdAndUpdate(
-          newProjectId,
-          { $addToSet: { tasks: new mongoose.Types.ObjectId(taskId) } },
-          { new: true }
-        );
+        await Project.findByIdAndUpdate(newProjectId, {
+          $addToSet: { tasks: taskId },
+        });
       }
     }
 
-    // Шаг 3: Обновляем саму задачу
+    // Обновляем саму задачу
+    const updateData = {
+      ...req.body,
+      project: projectId, // Явно устанавливаем project
+    };
+
     const task = await Task.findOneAndUpdate(
       { _id: taskId, owner: userId },
-      { $set: req.body },
+      { $set: updateData },
       { new: true }
     ).populate("project", "title");
 
@@ -140,16 +130,13 @@ export const deleteTask = async (req: Request, res: Response) => {
     if (task.project) {
       const projectId = task.project.toString();
       await Project.findByIdAndUpdate(projectId, {
-        $pull: { tasks: new mongoose.Types.ObjectId(taskId) },
+        $pull: { tasks: taskId },
       });
-      console.log(`Removed task ${taskId} from project ${projectId}`);
     }
 
     await Task.deleteOne({ _id: taskId, owner: userId });
-    console.log(`Deleted task ${taskId}`);
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
-    console.error("Error deleting task:", error);
     res.status(400).json({ message: "Error deleting task", error });
   }
 };

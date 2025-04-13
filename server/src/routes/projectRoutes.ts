@@ -7,6 +7,7 @@ import {
   addTaskToProject,
   removeTaskFromProject,
   getProjectTasks,
+  searchProjects,
 } from "../controllers/projectController";
 import {
   validateProject,
@@ -21,6 +22,7 @@ const projectRoutes = express.Router();
 projectRoutes.use(auth);
 
 projectRoutes.get("/", getProjects);
+projectRoutes.get("/search", searchProjects);
 
 projectRoutes.post("/", validateProject, validateRequest, createProject);
 

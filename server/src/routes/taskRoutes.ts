@@ -1,5 +1,11 @@
 import express from "express";
-import { getTasks, createTask, updateTask, deleteTask } from "../controllers/taskController";
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+  searchTasks,
+} from "../controllers/taskController";
 import { validateTask, validateTaskId, validateRequest } from "../middleware/taskValidation";
 import { auth } from "../middleware/auth";
 
@@ -8,6 +14,7 @@ const taskRoutes = express.Router();
 taskRoutes.use(auth);
 
 taskRoutes.get("/", getTasks);
+taskRoutes.get("/search", searchTasks);
 // taskRoutes.post("/", createTask);
 taskRoutes.post("/", validateTask, validateRequest, createTask);
 // taskRoutes.put("/:id", updateTask);

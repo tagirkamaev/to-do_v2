@@ -7,14 +7,59 @@ import Task from "../models/Task";
 export const getProjects = async (req: Request, res: Response) => {
   try {
     const userId = req.user._id;
-    const projects = await Project.find({ owner: userId })
+
+    // Параметры пагинации
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    // Базовый запрос для текущего пользователя
+    const query: any = { owner: userId };
+
+    // Поиск по названию
+    if (req.query.search) {
+      query.title = { $regex: req.query.search, $options: "i" };
+    }
+
+    // Фильтрация по дате создания
+    if (req.query.startDate) {
+      query.createdAt = { ...query.createdAt, $gte: new Date(req.query.startDate as string) };
+    }
+
+    if (req.query.endDate) {
+      query.createdAt = { ...query.createdAt, $lte: new Date(req.query.endDate as string) };
+    }
+
+    // Сортировка (по умолчанию: по дате создания, убывание)
+    const sortField = (req.query.sortBy as string) || "createdAt";
+    const sortOrder = (req.query.sortOrder as string) === "asc" ? 1 : -1;
+    const sortOptions: any = {};
+    sortOptions[sortField] = sortOrder;
+
+    // Получение общего количества проектов
+    const total = await Project.countDocuments(query);
+
+    // Запрос проектов с пагинацией и сортировкой
+    const projects = await Project.find(query)
       .populate({
         path: "tasks",
         select: "title description completed createdAt",
         match: { owner: userId },
       })
-      .sort({ createdAt: -1 });
-    res.status(200).json(projects);
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    // Возвращаем проекты и метаданные пагинации
+    res.status(200).json({
+      projects,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching projects", error });
   }
@@ -88,8 +133,59 @@ export const getProjectTasks = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Project not found or you don't have access to it" });
     }
 
-    const tasks = await Task.find({ project: projectId, owner: userId }).sort({ createdAt: -1 });
-    res.status(200).json(tasks);
+    // Параметры пагинации
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    // Базовый запрос для задач проекта
+    const query: any = { project: projectId, owner: userId };
+
+    // Фильтрация по статусу
+    if (req.query.status) {
+      query.status = req.query.status;
+    }
+
+    // Фильтрация по приоритету
+    if (req.query.priority) {
+      query.priority = req.query.priority;
+    }
+
+    // Поиск по тексту
+    if (req.query.search) {
+      query.$or = [
+        { title: { $regex: req.query.search, $options: "i" } },
+        { description: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
+
+    // Фильтрация по дате
+    if (req.query.completed) {
+      query.completed = req.query.completed === "true";
+    }
+
+    // Сортировка (по умолчанию: по дате создания, убывание)
+    const sortField = (req.query.sortBy as string) || "createdAt";
+    const sortOrder = (req.query.sortOrder as string) === "asc" ? 1 : -1;
+    const sortOptions: any = {};
+    sortOptions[sortField] = sortOrder;
+
+    // Получение общего количества задач
+    const total = await Task.countDocuments(query);
+
+    // Запрос задач проекта с пагинацией и сортировкой
+    const tasks = await Task.find(query).sort(sortOptions).skip(skip).limit(limit);
+
+    // Возвращаем задачи и метаданные пагинации
+    res.status(200).json({
+      tasks,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching project tasks", error });
   }
@@ -128,5 +224,57 @@ export const removeTaskFromProject = async (req: Request, res: Response) => {
     res.status(200).json(project);
   } catch (error) {
     res.status(400).json({ message: "Error removing task from project", error });
+  }
+};
+
+// Search projects
+export const searchProjects = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user._id;
+    const searchTerm = req.query.q as string;
+
+    if (!searchTerm) {
+      return res.status(400).json({ message: "Search term is required" });
+    }
+
+    // Параметры пагинации
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    // Создаем поисковый запрос по полям проекта
+    const query = {
+      owner: userId,
+      $or: [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+      ],
+    };
+
+    // Получаем общее количество результатов
+    const total = await Project.countDocuments(query);
+
+    // Выполняем поиск с пагинацией
+    const projects = await Project.find(query)
+      .populate({
+        path: "tasks",
+        select: "title description completed createdAt",
+        match: { owner: userId },
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      projects,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error searching projects", error });
   }
 };

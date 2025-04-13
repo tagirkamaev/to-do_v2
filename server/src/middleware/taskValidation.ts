@@ -17,6 +17,21 @@ export const validateTask = [
     .withMessage("Description must not exceed 500 characters"),
 
   body("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+
+  body("priority")
+    .optional()
+    .isIn(["low", "medium", "high"])
+    .withMessage("Priority must be one of: low, medium, high"),
+
+  body("status")
+    .optional()
+    .isIn(["todo", "in_progress", "done", "archived"])
+    .withMessage("Status must be one of: todo, in_progress, done, archived"),
+
+  body("dueDate")
+    .optional()
+    .isISO8601()
+    .withMessage("Due date must be a valid date in ISO 8601 format"),
 ];
 
 // Правила валидации для ID задачи

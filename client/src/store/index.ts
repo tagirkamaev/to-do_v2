@@ -1,8 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
+import uiReducer from "../features/ui/uiSlice";
 
 // Store config
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    ui: uiReducer,
+  },
 });
 
 // TS types

@@ -12,8 +12,8 @@ const ThemeToggleButton: React.FC = () => {
   };
 
   return (
-    <button onClick={handleToggleTheme}>
-      Switch to {theme === "light" ? "Dark" : "Light"} Theme
+    <button onClick={handleToggleTheme} className="theme-toggle-button">
+      {theme === "light" ? "Dark" : "Light"}
     </button>
   );
 };

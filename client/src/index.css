@@ -1,4 +1,34 @@
 :root {
+  /* Цветовая схема светлой темы */
+  --primary-light: #1976d2;
+  --secondary-light: #03a9f4;
+  --background-light: #ffffff;
+  --surface-light: #f5f5f5;
+  --text-primary-light: #212121;
+  --text-secondary-light: #757575;
+  --error-light: #d32f2f;
+  --success-light: #388e3c;
+
+  /* Цветовая схема темной темы */
+  --primary-dark: #2196f3;
+  --secondary-dark: #0288d1;
+  --background-dark: #121212;
+  --surface-dark: #1e1e1e;
+  --text-primary-dark: #ffffff;
+  --text-secondary-dark: #b0b0b0;
+  --error-dark: #ef5350;
+  --success-dark: #4caf50;
+
+  /* Общие переменные */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  --border-radius: 4px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -13,13 +43,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -28,6 +55,12 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 h1 {
@@ -65,4 +98,173 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Применение светлой темы */
+.app.light {
+  background-color: var(--background-light);
+  color: var(--text-primary-light);
+}
+
+/* Применение темной темы */
+.app.dark {
+  background-color: var(--background-dark);
+  color: var(--text-primary-dark);
+}
+
+/* Стили для header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--primary-light);
+  color: white;
+  box-shadow: var(--box-shadow);
+}
+
+.app.dark header {
+  background-color: var(--primary-dark);
+}
+
+/* Стили для форм */
+form {
+  max-width: 400px;
+  margin: var(--spacing-lg) auto;
+  padding: var(--spacing-lg);
+  background-color: var(--surface-light);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.app.dark form {
+  background-color: var(--surface-dark);
+}
+
+form div {
+  margin-bottom: var(--spacing-md);
+}
+
+label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+}
+
+.app.dark input {
+  background-color: #333;
+  color: var(--text-primary-dark);
+  border-color: #555;
+}
+
+button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-light);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.app.dark button {
+  background-color: var(--primary-dark);
+}
+
+button:hover {
+  background-color: var(--secondary-light);
+}
+
+.app.dark button:hover {
+  background-color: var(--secondary-dark);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+/* Сообщения об ошибках и успехе */
+.error {
+  color: var(--error-light);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background-color: rgba(211, 47, 47, 0.1);
+  border-radius: var(--border-radius);
+}
+
+.app.dark .error {
+  color: var(--error-dark);
+  background-color: rgba(239, 83, 80, 0.1);
+}
+
+.success {
+  color: var(--success-light);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background-color: rgba(56, 142, 60, 0.1);
+  border-radius: var(--border-radius);
+}
+
+.app.dark .success {
+  color: var(--success-dark);
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Кнопка переключения темы */
+.theme-toggle-button {
+  background-color: transparent;
+  border: 1px solid white;
+}
+
+/* Стили для профиля */
+.profile-info {
+  max-width: 600px;
+  margin: var(--spacing-lg) auto;
+  padding: var(--spacing-lg);
+  background-color: var(--surface-light);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.app.dark .profile-info {
+  background-color: var(--surface-dark);
+}
+
+.profile-info p {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid #eee;
+}
+
+.app.dark .profile-info p {
+  border-bottom-color: #333;
+}
+
+h1,
+h2,
+h3 {
+  text-align: center;
+  margin: var(--spacing-md) 0;
 }
